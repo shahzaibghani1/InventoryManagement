@@ -21,7 +21,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/dashboard");
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/dashboard`);
         setApiData(response.data);
         setError(null);
         console.log(response.data);
@@ -36,7 +36,7 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return <div className="flex justify-center"><Spinner className="h-10 w-10"/></div>;
+    return <div className="flex justify-center"><Spinner className="h-10 w-10" /></div>;
   }
 
   if (error) {

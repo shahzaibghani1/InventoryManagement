@@ -64,8 +64,8 @@ const Sales = () => {
     const fetchData = async () => {
       try {
         const [saleData, skuResponse] = await Promise.all([
-          axios.get("http://localhost:3000/api/v2/getSale"),
-          axios.get("http://localhost:3000/api/getSKU"),
+          axios.get(`${import.meta.env.VITE_BASE_URL}/api/v2/getSale`),
+          axios.get(`${import.meta.env.VITE_BASE_URL}/api/getSKU`),
         ]);
         setSalesData(saleData.data.data);
         setSkuValue(skuResponse.data.data);
@@ -100,7 +100,7 @@ const Sales = () => {
         change: Number(change) || 0,
       };
       const response = await axios.post(
-        "http://localhost:3000/api/v2/addSale",
+        `${import.meta.env.VITE_BASE_URL}/api/v2/addSale`,
         saleData
       );
       toast.success(response?.data?.msg);
@@ -116,14 +116,14 @@ const Sales = () => {
   const handleDelete = useCallback(async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:3000/api/v2/deleteSale/${deleteSale.saleId}`
+        `${import.meta.env.VITE_BASE_URL}/api/v2/deleteSale/${deleteSale.saleId}`
       );
       toast.success(response?.data?.msg);
     } catch (error) {
       console.log("Failed to delete Sale", error.message);
       toast.error(error?.response?.data?.msg);
     }
-    setRefreshTrigger((prev) => prev + 1); 
+    setRefreshTrigger((prev) => prev + 1);
     setDeleteOpen(false);
     setDeleteSale(null);
   }, [deleteSale]);
@@ -323,7 +323,7 @@ const Sales = () => {
                   >
                     View
                   </td>
-                  <td className="p-3 text-center">{p.saleTotal}</td>
+                  <td className="p-3 text-center">{p.grandTotal}</td>
                   <td className="p-3 text-center">{dateFixed(p.saleDate)}</td>
                   <td className="p-3 text-center">
                     <button onClick={() => handleDeleteOpen(p)} className="p-1">
@@ -663,7 +663,7 @@ const Sales = () => {
                   </table>
                   <div className="text-right font-semibold text-[15px] mr-4">
                     <div className="mt-10">
-                      Grand Total: {viewSale.saleTotal}
+                      Grand Total: {viewSale.grandTotal}
                     </div>
                   </div>
                   <div className="text-right font-semibold text-[15px] mr-4">

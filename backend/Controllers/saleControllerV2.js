@@ -2,7 +2,7 @@ const db = require("../database/database");
 
 const getSale = async (req, res) => {
   try {
-    const [result] = await db.query("select * from sales");
+    const [result] = await db.query("select * from sales order by saleId DESC");
     res.status(200).json({
       success: true,
       data: result,
@@ -28,6 +28,10 @@ const addSale = async (req, res) => {
         .json({ success: false, msg: "No sale items provided." });
     }
 
+    // Check if payment is less than saleTotal or zero
+    const pay = parseInt(payment);
+    const shouldSetZeroValues = pay < saleTotal || pay === 0;
+
     for (const item of saleItems) {
       const { sku, saleQuantity } = item;
 
@@ -48,21 +52,43 @@ const addSale = async (req, res) => {
         });
       }
     }
-
+    const totalSalePrice = shouldSetZeroValues ? 0 : saleTotal;
     // Step 2: Begin transaction
     saleItems = JSON.stringify(saleItems);
-    const pay = parseInt(payment);
     const [newSale] = await db.query(
-      "Insert into sales (name, phoneNo, saleItems, saleTotal, saleDate, payment, changeBack) values (?,?,?,?,?,?,?)",
-      [name, phoneNo, saleItems, saleTotal, currentDate, pay, change]
+      "Insert into sales (name, phoneNo, saleItems, saleTotal, saleDate, payment, changeBack, grandTotal) values (?,?,?,?,?,?,?,?)",
+      [
+        name,
+        phoneNo,
+        saleItems,
+        totalSalePrice,
+        currentDate,
+        pay,
+        change,
+        saleTotal,
+      ]
     );
     saleItems = JSON.parse(saleItems);
+
     for (const item of saleItems) {
       const { sku, saleQuantity, unitPrice, price } = item;
+
+      // Determine values based on payment condition
+      const finalUnitPrice = shouldSetZeroValues ? 0 : unitPrice;
+      const finalPrice = shouldSetZeroValues ? 0 : price;
+
       const [newSaleItems] = await db.query(
         "Insert into sale_items (saleId, sku, unitPrice, quantity, total, createdAt) values (?,?,?,?,?,?)",
-        [newSale.insertId, sku, unitPrice, saleQuantity, price, currentDate]
+        [
+          newSale.insertId,
+          sku,
+          finalUnitPrice,
+          saleQuantity,
+          finalPrice,
+          currentDate,
+        ]
       );
+
       const newQuantity = -saleQuantity;
       const [newTransaction] = await db.query(
         "Insert into transactions (sku,tx_type, quantity,rate,total, tx_date, reference_id) values (?,?,?,?,?,?,?)",
@@ -70,15 +96,20 @@ const addSale = async (req, res) => {
           sku,
           "sale",
           newQuantity,
-          unitPrice,
-          price,
+          finalUnitPrice,
+          finalPrice,
           currentDate,
           newSale.insertId,
         ]
       );
     }
 
-    res.status(200).json({ success: true, msg: "Sale Generated Successfully" });
+    res.status(200).json({
+      success: true,
+      msg: shouldSetZeroValues
+        ? "Sale Generated Successfully (not paid)"
+        : "Sale Generated Successfully",
+    });
   } catch (err) {
     console.error("Database Error:", err);
     res.status(500).json({

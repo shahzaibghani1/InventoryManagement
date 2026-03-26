@@ -12,6 +12,7 @@ import {
   DialogBody,
   DialogFooter,
 } from "@material-tailwind/react";
+import { useMemo } from "react";
 
 /**
  * Reports component
@@ -42,6 +43,31 @@ const Reports = () => {
   const printRef = useRef(null);
   const [printMode, setPrintMode] = useState("sales"); // which dataset to print
 
+  // Calculate totals from data - these will update automatically when data changes
+  const totalSaleQty = useMemo(() => {
+    return salesData.reduce((sum, row) => sum + parseFloat(row.sale || 0), 0);
+  }, [salesData]);
+
+  const totalSaleAmount = useMemo(() => {
+    return salesData.reduce((sum, row) => sum + parseFloat(row.amount || 0), 0);
+  }, [salesData]);
+
+  const totalOpening = useMemo(() => {
+    return stockData.reduce((sum, row) => sum + parseFloat(row.Opn || 0), 0);
+  }, [stockData]);
+
+  const totalReceiving = useMemo(() => {
+    return stockData.reduce((sum, row) => sum + parseFloat(row.Rec || 0), 0);
+  }, [stockData]);
+
+  const totalSaleStock = useMemo(() => {
+    return stockData.reduce((sum, row) => sum + parseFloat(row.Sale || 0), 0);
+  }, [stockData]);
+
+  const totalAvailable = useMemo(() => {
+    return stockData.reduce((sum, row) => sum + parseFloat(row.Bal || 0), 0);
+  }, [stockData]);
+
   // Helper: format currency
   const formatMoney = (v) => {
     if (v == null) return "-";
@@ -61,7 +87,7 @@ const Reports = () => {
     setSalesLoading(true);
     try {
       // <-- Replace this URL with your real sales report endpoint
-      const url = `http://localhost:3000/api/getSaleReport`;
+      const url = `${import.meta.env.VITE_BASE_URL}/api/getSaleReport`;
       const res = await axios.get(url, {
         params: { start: salesStart, end: salesEnd },
       });
@@ -71,8 +97,8 @@ const Reports = () => {
       console.error("Sales report error", err);
       setSalesError(
         err.response?.data?.message ??
-          err.message ??
-          "Failed to fetch sales report"
+        err.message ??
+        "Failed to fetch sales report"
       );
       setSalesData([]);
     } finally {
@@ -89,7 +115,7 @@ const Reports = () => {
     setStockLoading(true);
     try {
       // <-- Replace this URL with your real stock report endpoint
-      const url = `http://localhost:3000/api/getStockReport`;
+      const url = `${import.meta.env.VITE_BASE_URL}/api/getStockReport`;
       const res = await axios.get(url, {
         params: { start: stockStart, end: stockEnd },
       });
@@ -99,8 +125,8 @@ const Reports = () => {
       console.error("Stock report error", err);
       setStockError(
         err.response?.data?.message ??
-          err.message ??
-          "Failed to fetch stock report"
+        err.message ??
+        "Failed to fetch stock report"
       );
       setStockData([]);
     } finally {
@@ -200,6 +226,13 @@ const Reports = () => {
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr className="font-bold bg-gray-100">
+            <td>Total</td>
+            <td>{totalSaleQty.toFixed(2)}</td>
+            <td>{totalSaleAmount.toFixed(2)}</td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );
@@ -239,6 +272,15 @@ const Reports = () => {
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr className="font-bold bg-gray-100">
+            <td>Total</td>
+            <td>{totalOpening.toFixed(2)}</td>
+            <td>{totalReceiving.toFixed(2)}</td>
+            <td>{totalSaleStock.toFixed(2)}</td>
+            <td>{totalAvailable.toFixed(2)}</td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );
@@ -272,6 +314,13 @@ const Reports = () => {
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr>
+                <td>Total</td>
+                <td>{totalSaleQty.toFixed(2)}</td>
+                <td>{totalSaleAmount.toFixed(2)}</td>
+              </tr>
+            </tfoot>
           </table>
           <div className="divider" />
           <div className="right bold">
@@ -312,6 +361,15 @@ const Reports = () => {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr>
+              <td>Total</td>
+              <td>{totalOpening}</td>
+              <td>{totalReceiving}</td>
+              <td>{totalSaleStock}</td>
+              <td>{totalAvailable}</td>
+            </tr>
+          </tfoot>
         </table>
         <div className="divider" />
         <div className="right bold">Printed: {new Date().toLocaleString()}</div>
@@ -349,13 +407,13 @@ const Reports = () => {
                     fill="#000000"
                   />{" "}
                   <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
                     d="M9.59235 5H13.8141C14.8954 5 14.3016 6.664 13.8638 7.679L13.3656 8.843L13.2983 9C13.7702 8.97651 14.2369 9.11054 14.6282 9.382C16.0921 10.7558 17.2802 12.4098 18.1256 14.251C18.455 14.9318 18.5857 15.6958 18.5019 16.451C18.4013 18.3759 16.8956 19.9098 15.0182 20H8.38823C6.51033 19.9125 5.0024 18.3802 4.89968 16.455C4.81587 15.6998 4.94656 14.9358 5.27603 14.255C6.12242 12.412 7.31216 10.7565 8.77823 9.382C9.1696 9.11054 9.63622 8.97651 10.1081 9L10.0301 8.819L9.54263 7.679C9.1068 6.664 8.5101 5 9.59235 5Z"
                     stroke="#000000"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />{" "}
                   <path
                     d="M13.2983 9.75C13.7125 9.75 14.0483 9.41421 14.0483 9C14.0483 8.58579 13.7125 8.25 13.2983 8.25V9.75ZM10.1081 8.25C9.69391 8.25 9.35812 8.58579 9.35812 9C9.35812 9.41421 9.69391 9.75 10.1081 9.75V8.25ZM15.9776 8.64988C16.3365 8.44312 16.4599 7.98455 16.2531 7.62563C16.0463 7.26671 15.5878 7.14336 15.2289 7.35012L15.9776 8.64988ZM13.3656 8.843L13.5103 9.57891L13.5125 9.57848L13.3656 8.843ZM10.0301 8.819L10.1854 8.08521L10.1786 8.08383L10.0301 8.819ZM8.166 7.34357C7.80346 7.14322 7.34715 7.27469 7.1468 7.63722C6.94644 7.99976 7.07791 8.45607 7.44045 8.65643L8.166 7.34357ZM13.2983 8.25H10.1081V9.75H13.2983V8.25ZM15.2289 7.35012C14.6019 7.71128 13.9233 7.96683 13.2187 8.10752L13.5125 9.57848C14.3778 9.40568 15.2101 9.09203 15.9776 8.64988L15.2289 7.35012ZM13.2209 8.10709C12.2175 8.30441 11.1861 8.29699 10.1854 8.08525L9.87486 9.55275C11.0732 9.80631 12.3086 9.81521 13.5103 9.57891L13.2209 8.10709ZM10.1786 8.08383C9.47587 7.94196 8.79745 7.69255 8.166 7.34357L7.44045 8.65643C8.20526 9.0791 9.02818 9.38184 9.88169 9.55417L10.1786 8.08383Z"
@@ -383,9 +441,9 @@ const Reports = () => {
                   <path
                     d="M6.29977 5H21L19 12H7.37671M20 16H8L6 3H3M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20ZM20 20C20 20.5523 19.5523 21 19 21C18.4477 21 18 20.5523 18 20C18 19.4477 18.4477 19 19 19C19.5523 19 20 19.4477 20 20Z"
                     stroke="#000000"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />{" "}
                 </svg>
                 Stocks

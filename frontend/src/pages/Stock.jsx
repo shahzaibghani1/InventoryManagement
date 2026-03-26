@@ -49,9 +49,9 @@ const Stock = () => {
       try {
         const [stockResponseDetailed, stockResponse, skuResponse] =
           await Promise.all([
-            axios.get("http://localhost:3000/api/getStockDetailed"),
-            axios.get("http://localhost:3000/api/getStock"),
-            axios.get("http://localhost:3000/api/getSKU"),
+            axios.get(`${import.meta.env.VITE_BASE_URL}/api/getStockDetailed`),
+            axios.get(`${import.meta.env.VITE_BASE_URL}/api/getStock`),
+            axios.get(`${import.meta.env.VITE_BASE_URL}/api/getSKU`),
           ]);
 
         setStockData(stockResponseDetailed.data.data);
@@ -155,7 +155,7 @@ const Stock = () => {
   const handleEditSave = useCallback(async () => {
     try {
       const response = await axios.put(
-        "http://localhost:3000/api/updateStock",
+        `${import.meta.env.VITE_BASE_URL}/api/updateStock`,
         editStock
       );
       toast.success("Stock Updated Successfully");
@@ -175,7 +175,7 @@ const Stock = () => {
   const handleDelete = useCallback(async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:3000/api/deleteStock/${deleteStock.stockId}`
+        `${import.meta.env.VITE_BASE_URL}/api/deleteStock/${deleteStock.stockId}`
       );
       toast.success(response?.data?.message);
     } catch (error) {
@@ -190,7 +190,7 @@ const Stock = () => {
   const handleAddStock = useCallback(async () => {
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/addStock`,
+        `${import.meta.env.VITE_BASE_URL}/api/addStock`,
         newStockData
       );
       toast.success(response?.data?.message);

@@ -1,15 +1,5 @@
 import React from "react";
 
-/**
- * sale = {
- *   saleId: "INV-1001",
- *   saleDate: new Date().toISOString(),
- *   name: "Ali",
- *   phoneNo: "03001234567",
- *   saleItems: [{ productName, saleQuantity, unitPrice, price }, ...],
- *   salePrice: 220
- * }
- */
 export function printReceiptUsingBlob(sale) {
   if (!sale) return;
 

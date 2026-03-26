@@ -6,14 +6,14 @@ const port = 3000;
 const path = require("path");
 const cors = require("cors");
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "http://localhost:80", "http://localhost"],
 };
-const dashboardRoutes = require("./Routes/dashboardRoute");
-const productRoutes = require("./Routes/productRoutes");
-const stockRoutes = require("./Routes/stockRoutes");
-const clientRoutes = require("./Routes/clientRoute");
-const reportRoutes = require("./Routes/reportRoute");
-const saleRoutesV2 = require("./Routes/saleRouteV2");
+const dashboardRoutes = require("./routes/dashboardRoute");
+const productRoutes = require("./routes/productRoutes");
+const stockRoutes = require("./routes/stockRoutes");
+const clientRoutes = require("./routes/clientRoute");
+const reportRoutes = require("./routes/reportRoute");
+const saleRoutesV2 = require("./routes/saleRouteV2");
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -34,6 +34,6 @@ app.use("/api/v2", saleRoutesV2);
 //   res.sendFile(path.join(__dirname, "dist", "index.html"));
 // });
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`App is runnig on port ${port}`);
 });

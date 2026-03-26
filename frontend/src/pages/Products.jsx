@@ -25,7 +25,7 @@ const Products = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/getProduct"
+          `${import.meta.env.VITE_BASE_URL}/api/getProduct`
         );
         setProductData(response.data.data);
       } catch (err) {
@@ -62,7 +62,7 @@ const Products = () => {
     try {
       // 2️⃣ Send update request
       const response = await axios.put(
-        "http://localhost:3000/api/updateProduct",
+        `${import.meta.env.VITE_BASE_URL}/api/updateProduct`,
         editableProduct
       );
 
@@ -86,7 +86,7 @@ const Products = () => {
     console.log(productToDelete);
     try {
       const response = await axios.delete(
-        `http://localhost:3000/api/deleteProduct/${productToDelete.productId}`
+        `${import.meta.env.VITE_BASE_URL}/api/deleteProduct/${productToDelete.productId}`
       );
       toast.success(response?.data?.message);
       setRefreshFlag((prev) => !prev); // after successful add/delete
@@ -102,7 +102,7 @@ const Products = () => {
   const handleAddProduct = useCallback(async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/addProduct",
+        `${import.meta.env.VITE_BASE_URL}/api/addProduct`,
         newProduct
       );
       toast.success(response?.data?.message);

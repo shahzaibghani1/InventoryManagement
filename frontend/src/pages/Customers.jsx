@@ -21,7 +21,7 @@ const Customers = () => {
   // Fetch client data
   const fetchData = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/getClient");
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/getClient`);
       setClientData(response.data.data);
     } catch (err) {
       console.error("Error fetching client data:", err);
@@ -65,7 +65,7 @@ const Customers = () => {
   const handleEditSave = useCallback(async () => {
     try {
       await axios.put(
-        "http://localhost:3000/api/updateClient",
+        `${import.meta.env.VITE_BASE_URL}/api/updateClient`,
         editClient
       );
       fetchData(); // Refresh after edit
@@ -83,7 +83,7 @@ const Customers = () => {
   const handleDelete = useCallback(async () => {
     try {
       await axios.delete(
-        `http://localhost:3000/api/deleteClient/${deleteClient.customerId}`
+        `${import.meta.env.VITE_BASE_URL}/api/deleteClient/${deleteClient.customerId}`
       );
       fetchData(); // Refresh after delete
     } catch (error) {
@@ -95,7 +95,7 @@ const Customers = () => {
 
   const handleAddClient = useCallback(async () => {
     try {
-      await axios.post("http://localhost:3000/api/addClient", newClient);
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/api/addClient`, newClient);
       fetchData(); // Refresh after add
     } catch (error) {
       console.log("Failed to add Client", error.message);
